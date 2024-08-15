@@ -48,13 +48,13 @@ def buscar_asistencia_por_fecha(fecha):
             conn.close()
             print('Conexión cerrada')
 
-def obtener_todas_asistencias_ok():
+def obtener_todas_asistencias():
     try:
         conn = mysql.connector.connect(**config)
         if conn.is_connected():
             print('Conexión exitosa a la base de datos')
             cursor = conn.cursor()
-            query = "SELECT * FROM asistencia_registro WHERE estado = 'si_trabajo'"
+            query = "SELECT * FROM asistencia_registro"
             print(query)
             cursor.execute(query)
             results = cursor.fetchall()

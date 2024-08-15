@@ -5,6 +5,7 @@ import tkinter as tk
 from tkinter import messagebox
 from datetime import datetime
 from openpyxl import Workbook
+from typing import List
 
 class Asistencia():
     def __init__(self,estado,fecha):
@@ -16,10 +17,42 @@ class Asistencia():
         print(self.fecha)
         print(self.estado)
 
+class ResultadoExcel():
+    def __init__(self,num_semana,lista_dias,total):
+        self.num_semana = num_semana
+        self.lista_dias: List[Asistencia] = lista_dias
+        self.total = total
+
+    def obtener_lista_numero_semana(self):
+        lista_dias_ = []
+
+        for dia in self.lista_dias:
+            dia_semana_num = dia.fecha.weekday()
+            if dia.estado == 'si_trabajo':
+                lista_dias_.append(dia_semana_num)
+
+        return lista_dias_
+
+class DiaNumeroSemana():
+    def __init__(self, num_semana, fecha, estado):
+        self.num_semana = num_semana
+        self.fecha = fecha
+        self.estado = estado
+
 def registrar_si():
     fecha_actual = datetime.now().date()
+    print("22222222222")
+    print(fecha_actual)
+    
+    dia_semana = fecha_actual.weekday()
+
+    if dia_semana == 5 or dia_semana == 6:
+        print("No se puede registrar asistencia")
+        return
+
     nueva_asistencia = Asistencia('si_trabajo',fecha_actual)
     fecha_coincidencias = buscar_asistencia_por_fecha(fecha_actual)
+    
     if not fecha_coincidencias:
         insertar(nueva_asistencia)
         nueva_asistencia.imprimir()
@@ -30,6 +63,7 @@ def registrar_no():
     fecha_actual = datetime.now().date()
     nueva_asistencia = Asistencia('no_trabajo',fecha_actual)
     fecha_coincidencias = buscar_asistencia_por_fecha(fecha_actual)
+
     if not fecha_coincidencias:
         insertar(nueva_asistencia)
         nueva_asistencia.imprimir()
@@ -45,32 +79,38 @@ def obtener_numero_semana(fecha):
 
 def generar_reporte():
     lista_tmp = []
-    lista_final = []
-    lista_asistencias = obtener_todas_asistencias_ok()
+    lista_resultado_excel = []
+    lista_asistencias = []
+    datos = obtener_todas_asistencias()
+
+
+    for dato in datos:
+        lista_asistencias.append(Asistencia(dato[2], dato[1]))
+
     for registro in lista_asistencias:
-        fecha_registro = registro[1]
+        fecha_registro = registro.fecha
+        estado_ = registro.estado
         num_semana = obtener_numero_semana(fecha_registro)
-        lista_tmp.append([num_semana,fecha_registro])
-        print(num_semana," ",fecha_registro)
+        lista_tmp.append(DiaNumeroSemana(num_semana, fecha_registro,estado_))
+
     for num_sem in range(1,36):
         dias_semana = []
+        dias_trabajados = 0
+
         for registro in lista_tmp:
-            if registro[0] == num_sem:
-                dias_semana.append(registro)
+            if registro.num_semana == num_sem:
+                if registro.estado == 'si_trabajo':
+                    dias_trabajados += 1
+                dias_semana.append(Asistencia(registro.estado, registro.fecha))
+
         if len(dias_semana) > 0:
-            suma_semana = len(dias_semana) * 80
-            lista_final.append([num_sem,dias_semana,suma_semana])
-            print([num_sem,dias_semana,suma_semana])
-            print("4444444444444444444")
-            #print(num_sem, suma_semana)
-    exportar_excel(lista_final)
-
-def obtener_dia_de_semana(fecha):
-    fecha_obj = datetime.strptime(fecha, '%Y-%m-%d').date()
-    dia_semana_num = fecha_obj.weekday()
-    return dia_semana_num
-
-
+            suma_semana = dias_trabajados * 80
+            lista_resultado_excel.append(ResultadoExcel(num_sem,dias_semana,suma_semana))
+        
+    exportar_excel(lista_resultado_excel)
+    print("0000000000000000000")
+    print(lista_resultado_excel)
+    print("0000000000000000000")
 
 def exportar_excel(datos):
     cont = 2
@@ -85,18 +125,17 @@ def exportar_excel(datos):
     ws['G1'] = "TOTAL"
     
     for registro in datos:
-        ws[f'A{cont}'] = registro[0]
-        lista_dias = []
-        for dato in registro[1]:
-            dia_semana_num = obtener_dia_de_semana(str(dato[1]))
-            lista_dias.append(dia_semana_num)
+        ws[f'A{cont}'] = registro.num_semana
+        
+        lista_dias_ = registro.obtener_lista_numero_semana()
+
         for i in range(0,6): # 0 es lunes, 1 es martes ...
             letra = chr(ord('A')+i+1)
-            if i in lista_dias:
+            if i in lista_dias_:
                 ws[f'{letra}{cont}'] = 'SI'
             else:
                 ws[f'{letra}{cont}'] = 'NO'
-        ws[f'G{cont}'] = registro[2]
+        ws[f'G{cont}'] = registro.total
 
         cont += 1
 
