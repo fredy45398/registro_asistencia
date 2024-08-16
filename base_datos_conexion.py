@@ -86,3 +86,42 @@ def buscar_estado():
             cursor.close()
             conn.close()
             print('Conexión cerrada')
+
+def buscar_fecha_minima():
+    try:
+        conn = mysql.connector.connect(**config)
+        if conn.is_connected():
+            print('Conexión exitosa a la base de datos')
+            cursor = conn.cursor()
+            query = "SELECT MIN(fecha) AS fecha_minima FROM asistencia_registro"
+            cursor.execute(query)
+            results = cursor.fetchall()
+            return results
+            
+    except mysql.connector.Error as err:
+        print(f'Error: {err}')
+    finally:
+        if conn.is_connected():
+            cursor.close()
+            conn.close()
+            print('Conexión cerrada')
+
+def buscar_fecha_maxima():
+    try:
+        conn = mysql.connector.connect(**config)
+        if conn.is_connected():
+            print('Conexión exitosa a la base de datos')
+            cursor = conn.cursor()
+            query = "SELECT MAX(fecha) AS fecha_maxima FROM asistencia_registro"
+            cursor.execute(query)
+            results = cursor.fetchall()
+            return results
+            
+    except mysql.connector.Error as err:
+        print(f'Error: {err}')
+    finally:
+        if conn.is_connected():
+            cursor.close()
+            conn.close()
+            print('Conexión cerrada')
+
