@@ -28,6 +28,64 @@ def insertar(nueva_asistencia):
             conn.close()
             print('Conexión cerrada')
 
+def insertar_pago(nuevo_pago):
+    try:
+        conn = mysql.connector.connect(**config)
+        if conn.is_connected():
+            print('Conexión exitosa a la base de datos')
+            cursor = conn.cursor()
+            query = "INSERT INTO semanas_pagadas (numero_semana, estado_pago) VALUES (%s, %s)"
+            values = (nuevo_pago.numero_semana, nuevo_pago.estado_pago)
+            cursor.execute(query, values)
+            conn.commit()
+            print(f'{cursor.rowcount} registro(s) insertado(s).')
+    except mysql.connector.Error as err:
+        print(f'Error: {err}')
+    finally:
+        if conn.is_connected():
+            cursor.close()
+            conn.close()
+            print('Conexión cerrada')
+
+def obtener_semanas_pagadas():
+    try:
+        conn = mysql.connector.connect(**config)
+        if conn.is_connected():
+            print('Conexión exitosa a la base de datos')
+            cursor = conn.cursor()
+            query = "SELECT * FROM semanas_pagadas"
+            print(query)
+            cursor.execute(query,)
+            results = cursor.fetchall()
+            return results
+            
+    except mysql.connector.Error as err:
+        print(f'Error: {err}')
+    finally:
+        if conn.is_connected():
+            cursor.close()
+            conn.close()
+            print('Conexión cerrada')
+
+def actualizar_estado_pagado(registro_de_pago):
+    try:
+        conn = mysql.connector.connect(**config)
+        if conn.is_connected():
+            print('Conexión exitosa a la base de datos')
+            cursor = conn.cursor()
+            query = "UPDATE semanas_pagadas SET estado_pago = 'si_pagado', fecha_pago = %s where id = %s"
+            values = (registro_de_pago.fecha_registro_pago, registro_de_pago.id)
+            cursor.execute(query, values)
+            conn.commit()
+            print(f'{cursor.rowcount} registro(s) actualizado(s).')
+    except mysql.connector.Error as err:
+        print(f'Error: {err}')
+    finally:
+        if conn.is_connected():
+            cursor.close()
+            conn.close()
+            print('Conexión cerrada')
+
 def buscar_asistencia_por_fecha(fecha):
     try:
         conn = mysql.connector.connect(**config)

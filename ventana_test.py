@@ -1,54 +1,57 @@
 import tkinter as tk
 from tkinter import ttk
 
-# Función para el evento del botón
-def on_button_click(index):
-    print(f"Botón en la fila {index + 1} fue presionado")
-
-# Crear la ventana principal
+# Ventana principal
 root = tk.Tk()
-root.title("Tabla en Ventana Principal")
+root.title("Dos Formularios en una Tabla General")
+root.geometry("600x400")
 
-# Definir el tamaño de la ventana principal
-ancho_ventana = 500
-alto_ventana = 300
-root.geometry(f"{ancho_ventana}x{alto_ventana}")
+# Canvas para contener los formularios
+canvas = tk.Canvas(root)
+canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
-# Crear un frame para contener el Canvas y el Scrollbar, y centrarlo
-frame = tk.Frame(root)
-frame.place(relx=0.5, rely=0.5, anchor="center")
-
-# Crear un Canvas para simular la tabla y permitir el desplazamiento
-canvas = tk.Canvas(frame)
-canvas.pack(side="left", fill="both", expand=True)
-
-# Crear un Scrollbar vertical para el Canvas
-scrollbar = ttk.Scrollbar(frame, orient="vertical", command=canvas.yview)
-scrollbar.pack(side="right", fill="y")
-
-# Configurar el Canvas para usar el Scrollbar
+# Scrollbar para el Canvas
+scrollbar = ttk.Scrollbar(root, orient="vertical", command=canvas.yview)
+scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 canvas.configure(yscrollcommand=scrollbar.set)
-canvas.bind('<Configure>', lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
 
-# Crear un frame secundario dentro del Canvas, con borde y fondo claro
-frame_in_canvas = tk.Frame(canvas, bd=2, relief="solid", bg="#f0f0f0")  # Añadir fondo claro
-canvas.create_window((0, 0), window=frame_in_canvas, anchor="nw")
+# Frame dentro del Canvas que contendrá los formularios
+frame = tk.Frame(canvas)
+canvas.create_window((0, 0), window=frame, anchor="nw")
 
-# Lista de valores a mostrar en la primera columna
-valores = [f"Valor {i+1}" for i in range(10)]
+# Función para ajustar el tamaño del Canvas según el contenido
+def on_frame_configure(event):
+    canvas.configure(scrollregion=canvas.bbox("all"))
 
-# Añadir filas con texto y un botón a cada una
-for i, valor in enumerate(valores):
-    # Crear etiqueta para el valor de la primera columna
-    label = tk.Label(frame_in_canvas, text=valor, width=30, anchor="w", bg="#f0f0f0")
-    label.grid(row=i, column=0, padx=5, pady=2)
+frame.bind("<Configure>", on_frame_configure)
 
-    # Crear botón para la segunda columna
-    boton = tk.Button(frame_in_canvas, text="Click Me", command=lambda i=i: on_button_click(i))
-    boton.grid(row=i, column=1, padx=5, pady=2)
+# Función para crear un formulario
+def crear_formulario(parent, titulo):
+    form_frame = ttk.LabelFrame(parent, text=titulo, padding=(10, 10))
+    form_frame.pack(fill=tk.BOTH, expand=True, pady=(10, 5))
 
-# Ajustar el tamaño del frame_in_canvas al contenido
-frame_in_canvas.update_idletasks()
+    # Ejemplo de entradas de texto y etiquetas
+    ttk.Label(form_frame, text="Nombre:").grid(row=0, column=0, sticky=tk.W, padx=5, pady=5)
+    ttk.Entry(form_frame).grid(row=0, column=1, padx=5, pady=5)
 
-# Ejecutar el bucle principal de la ventana
+    ttk.Label(form_frame, text="Apellido:").grid(row=1, column=0, sticky=tk.W, padx=5, pady=5)
+    ttk.Entry(form_frame).grid(row=1, column=1, padx=5, pady=5)
+
+    ttk.Label(form_frame, text="Correo Electrónico:").grid(row=2, column=0, sticky=tk.W, padx=5, pady=5)
+    ttk.Entry(form_frame).grid(row=2, column=1, padx=5, pady=5)
+
+    ttk.Label(form_frame, text="Teléfono:").grid(row=3, column=0, sticky=tk.W, padx=5, pady=5)
+    ttk.Entry(form_frame).grid(row=3, column=1, padx=5, pady=5)
+
+    ttk.Button(form_frame, text="Enviar").grid(row=4, columnspan=2, pady=10)
+
+# Crear dos formularios, uno debajo del otro
+crear_formulario(frame, "Formulario 1")
+crear_formulario(frame, "Formulario 2")
+
+# Ajustar el tamaño del Canvas al contenido
+frame.update_idletasks()
+canvas.config(scrollregion=canvas.bbox("all"))
+
+# Inicia el bucle principal
 root.mainloop()

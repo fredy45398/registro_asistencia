@@ -40,6 +40,80 @@ class DiaNumeroSemana():
         self.fecha = fecha
         self.estado = estado
 
+class SemanaPagada():
+    def __init__(self, id, numero_semana, fecha_registro_pago, estado_pago):
+        self.id = id
+        self.numero_semana = numero_semana
+        self.fecha_registro_pago = fecha_registro_pago
+        self.estado_pago = estado_pago
+
+#def registrar_pago_si():
+    #fecha_actual = datetime.now().date()
+    #insetar_asistencia(fecha_actual,'si_trabajo')
+
+
+# Calcula pagos pendientes y los inserta en la base de datos
+def pago_num_semana_estado():
+    lista_semanas = []  
+    semana_pagos = []
+    
+    fecha_minima = buscar_fecha_minima()
+    fecha_maxima = buscar_fecha_maxima()
+
+    num_semana_minima = obtener_numero_semana(fecha_minima[0][0])
+    num_semana_maxima = obtener_numero_semana(fecha_maxima[0][0])
+
+    datos_semanas = obtener_semanas_pagadas()
+    for datos in datos_semanas:
+        numero_semana = datos[1]
+        lista_semanas.append(numero_semana)
+ 
+    for i in range(num_semana_minima, num_semana_maxima + 1):
+        if i in lista_semanas:
+            continue
+        semana_pago = SemanaPagada(None, i, None, 'no_pagado')
+
+        insertar_pago(semana_pago)
+
+# Datos para mostrar en la interfaz
+def obtener_pagos_pendientes():
+    lista_valores_pag = []
+    datos_semanas = obtener_semanas_pagadas()
+    for datos in datos_semanas:
+        id_semanas_pagadas = datos[0]
+        numero_semana = datos[1]
+        estado_pago = datos[3]
+        if estado_pago != 'si_pagado':
+            lista_valores_pag.append(SemanaPagada(id_semanas_pagadas, numero_semana, None, estado_pago))
+
+
+    print("00000000000000000000000")
+    print(lista_valores_pag)
+    print("00000000000000000000000")
+    return lista_valores_pag
+
+def obtener_fecha_inicio_final_numero_semana(year, week_number):
+    
+    first_day_of_year = datetime(year, 1, 1)
+    
+    # Averiguar el día de la semana del primer día del año (lunes=0, domingo=6)
+    first_day_of_year_weekday = first_day_of_year.weekday()
+
+    # Calcular el primer lunes del año (la primera semana puede no comenzar en lunes)
+    days_to_first_monday = (7 - first_day_of_year_weekday) % 7
+    first_monday = first_day_of_year + timedelta(days=days_to_first_monday)
+
+    # Calcular la fecha de inicio de la semana
+    start_of_week = first_monday + timedelta(weeks=week_number - 1)
+
+    # Calcular la fecha de fin de la semana
+    end_of_week = start_of_week + timedelta(days=6)
+
+    return start_of_week.date(), end_of_week.date()  
+
+def registrar_i():
+    pass
+
 def insetar_asistencia(fecha, estado):
     dia_semana = fecha.weekday()
 
@@ -55,6 +129,8 @@ def insetar_asistencia(fecha, estado):
         nueva_asistencia.imprimir()
     else:
         print("Ya hay un registro")
+
+
 
 
 def registrar_si():
@@ -166,7 +242,7 @@ def calcular_fechas_pendientes():
 
 ventana = tk.Tk()
 ventana.title("Formulario de Registro")
-ventana.geometry("600x600")
+ventana.geometry("1000x1000")
 
 
 tk.Label(ventana, text="Se trabajo hoy?").grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
@@ -184,6 +260,7 @@ boton_generar_reporte.grid(row=2, column=3, padx=10, pady=10, sticky="nsew")
 tk.Label(ventana, text="Asistencias pendientes: ").grid(row=4, column=0, padx=10, pady=10, sticky="nsew")
 frame = tk.Frame(ventana)
 frame.place(relx=0.5, rely=0.5, anchor="center")
+frame.grid(row=5, column=0)
 
 # Crear un Canvas para simular la tabla y permitir el desplazamiento
 canvas = tk.Canvas(frame)
@@ -198,16 +275,21 @@ canvas.configure(yscrollcommand=scrollbar.set)
 canvas.bind('<Configure>', lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
 
 # Crear un frame secundario dentro del Canvas, con borde y fondo claro
-frame_in_canvas = tk.Frame(canvas, bd=2, relief="solid", bg="#f0f0f0")  # Añadir fondo claro
+frame_in_canvas = tk.Frame(canvas, bd=2, relief="solid", bg="#0000FF")  # Añadir fondo claro
 canvas.create_window((0, 0), window=frame_in_canvas, anchor="nw")
 
+
+
+
 #calcular_fechas_pendientes()
+#pago_num_semana_estado()
 def llenar_tabla(frame_in_canvas):
     # Primero, eliminar todas las filas existentes en la tabla
     for widget in frame_in_canvas.winfo_children():
         widget.destroy()
 
     valores = calcular_fechas_pendientes()
+    
 
     for i, valor in enumerate(valores):
         label = tk.Label(frame_in_canvas, text=valor, width=15, anchor="w", bg="#f0f0f0")
@@ -218,6 +300,7 @@ def llenar_tabla(frame_in_canvas):
         boton_no = tk.Button(frame_in_canvas, text="NO", command=lambda i=i: no_button_click(valores[i]))
         boton_no.grid(row=i,columnspan=2, column=4, padx=5, pady=2)
     frame_in_canvas.update_idletasks()
+
     
 # Función para el evento del botón
 def si_button_click(fecha_str):
@@ -230,7 +313,69 @@ def no_button_click(fecha_str):
     insetar_asistencia(fecha_date,'no_trabajo')
     llenar_tabla(frame_in_canvas)
 
+
+
+
+###################################### Segunda Tabla
+tk.Label(ventana, text="Pagos pendientes: ").grid(row=6, column=0, padx=10, pady=10, sticky="nsew")
+frame_1 = tk.Frame(ventana)
+frame_1.place(relx=0.5, rely=0.5, anchor="center")
+frame_1.grid(row=7, column=0)
+
+# Crear un Canvas para simular la tabla y permitir el desplazamiento
+canvas_1 = tk.Canvas(frame_1)
+canvas_1.pack(side="left", fill="both", expand=True)
+
+# Crear un Scrollbar vertical para el Canvas
+scrollbar_1 = ttk.Scrollbar(frame_1, orient="vertical", command=canvas_1.yview)
+scrollbar_1.pack(side="right", fill="y")
+
+# Configurar el Canvas para usar el Scrollbar
+canvas_1.configure(yscrollcommand=scrollbar_1.set)
+canvas_1.bind('<Configure>', lambda e: canvas_1.configure(scrollregion=canvas_1.bbox("all")))
+
+# Crear un frame secundario dentro del Canvas, con borde y fondo claro
+frame_in_canvas_1 = tk.Frame(canvas_1, bd=2, relief="solid", bg="#0000FF")  # Añadir fondo claro
+canvas_1.create_window((0, 0), window=frame_in_canvas_1, anchor="nw")
+
+
+
+# Funcion para marcar un pago
+def si_button_pago(objeto):
+    objeto.fecha_registro_pago = datetime.now().date()
+    actualizar_estado_pagado(objeto)
+    llenar_tabla_pago(frame_in_canvas_1)
+
+
+
+#calcular_fechas_pendientes()
+#pago_num_semana_estado()
+def llenar_tabla_pago(frame_in_canvas_2):
+    # Primero, eliminar todas las filas existentes en la tabla
+    for widget in frame_in_canvas_2.winfo_children():
+        widget.destroy()
+
+    lista_valores = obtener_pagos_pendientes()
+
+    for i, valor in enumerate(lista_valores):
+        label = tk.Label(frame_in_canvas_2, text=valor.numero_semana, width=15, anchor="w", bg="#f0f0f0")
+        label.grid(row=i, column=0, padx=5, pady=2)
+
+        fecha_inicial, fecha_final = obtener_fecha_inicio_final_numero_semana(2024, valor.numero_semana)
+        fecha_junta = str(fecha_inicial) + " / " + str(fecha_final)
+
+        label_2 = tk.Label(frame_in_canvas_2, text=fecha_junta, width=25, anchor="w", bg="#f0f0f0")
+        label_2.grid(row=i, column=1, padx=5, pady=2)
+        
+        boton_si = tk.Button(frame_in_canvas_2, text="SI", command=lambda i=i: si_button_pago(lista_valores[i]))
+        boton_si.grid(row=i, column=5, padx=5, pady=2)
+
+    frame_in_canvas_2.update_idletasks()
+######################################
+
+
 llenar_tabla(frame_in_canvas)
+llenar_tabla_pago(frame_in_canvas_1)
 
 ventana.mainloop()
 
