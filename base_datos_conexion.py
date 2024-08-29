@@ -5,7 +5,7 @@ config = {
     'user': 'root',
     'password': '',
     'host': 'localhost',
-    'database': 'asistenciadb'
+    'database': 'des_asistenciadb'
 }
 
 
@@ -47,13 +47,19 @@ def insertar_pago(nuevo_pago):
             conn.close()
             print('Conexión cerrada')
 
-def obtener_semanas_pagadas():
+def obtener_semanas_pagadas(flag_pagado=None):
     try:
         conn = mysql.connector.connect(**config)
         if conn.is_connected():
             print('Conexión exitosa a la base de datos')
             cursor = conn.cursor()
             query = "SELECT * FROM semanas_pagadas"
+            if flag_pagado != None:
+                if flag_pagado == True:
+                    query += " Where estado_pago = 'si_pagado'"
+                else:
+                    query += " Where estado_pago = 'no_pagado'"
+                    
             print(query)
             cursor.execute(query,)
             results = cursor.fetchall()
@@ -66,6 +72,12 @@ def obtener_semanas_pagadas():
             cursor.close()
             conn.close()
             print('Conexión cerrada')
+
+obtener_semanas_pagadas()
+obtener_semanas_pagadas(flag_pagado=True)
+obtener_semanas_pagadas(flag_pagado=False)
+
+
 
 def actualizar_estado_pagado(registro_de_pago):
     try:

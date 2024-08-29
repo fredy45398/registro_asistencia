@@ -47,6 +47,9 @@ class SemanaPagada():
         self.fecha_registro_pago = fecha_registro_pago
         self.estado_pago = estado_pago
 
+
+mensaje_label_dias = None
+mensaje_label_pag = None
 #def registrar_pago_si():
     #fecha_actual = datetime.now().date()
     #insetar_asistencia(fecha_actual,'si_trabajo')
@@ -89,8 +92,7 @@ def obtener_pagos_pendientes():
         estado_pago = datos[3]
         if estado_pago != 'si_pagado' and numero_semana < num_semana_actual:
             lista_valores_pag.append(SemanaPagada(id_semanas_pagadas, numero_semana, None, estado_pago))
-
-
+        
     print("00000000000000000000000")
     print(lista_valores_pag)
     print("00000000000000000000000")
@@ -131,16 +133,16 @@ def insetar_asistencia(fecha, estado):
     if not fecha_coincidencias:
         insertar(nueva_asistencia)
         nueva_asistencia.imprimir()
+        mensaje_label.config(text="Asistencia Registrada!!!!") #agregado
     else:
         print("Ya hay un registro")
-
-
+        mensaje_label.config(text="Ya hay un registro!!!!!")#agregado
 
 
 def registrar_si():
     fecha_actual = datetime.now().date()
     insetar_asistencia(fecha_actual,'si_trabajo')
-    
+
 
 def registrar_no():
     fecha_actual = datetime.now().date()
@@ -233,11 +235,6 @@ def calcular_fechas_pendientes():
     fecha_maxima_date  = datetime.now().date()
     fecha_nueva_date = fecha_minima_date
 
-    print("hoyyyyyyyyyyyy")
-    print(fecha_maxima_date)
-    print("hoyyyyyyyyyyyy")
-
-   
     if fecha_minima_date and fecha_maxima_date:
         fecha_nueva_date += timedelta(days=1)
         while fecha_nueva_date < fecha_maxima_date:
@@ -252,6 +249,28 @@ def calcular_fechas_pendientes():
 
     return fechas_pendientes 
 
+def dias_trabajados_total_pago():
+    fechas_registradas = set()
+    dias_trabajados = []
+    cont_no_paga = 0
+    semanas_no_pagadas_list = []
+    asis_todos_dias = obtener_todas_asistencias()
+    for dato in asis_todos_dias:
+        if dato[2] == "si_trabajo":
+            fechas_registradas.add(dato[1])
+
+    semanas_no_pagadas_list = obtener_semanas_pagadas(flag_pagado=False)
+    for dato in semanas_no_pagadas_list:
+        for dias in fechas_registradas:
+            numero_sem = obtener_numero_semana(dias)
+            if dato[1] == numero_sem:
+                cont_no_paga += 1
+    
+    total_pagar = cont_no_paga * 80
+
+    return cont_no_paga, total_pagar
+
+
 ventana = tk.Tk()
 ventana.title("Formulario de Registro")
 ventana.geometry("1000x1000")
@@ -261,6 +280,9 @@ tk.Label(ventana, text="Se trabajo hoy?").grid(row=1, column=0, padx=10, pady=10
 
 boton_registrar_si = tk.Button(ventana, text="Si", command=registrar_si)
 boton_registrar_si.grid(row=1, column=1, padx=10, pady=10, sticky="nsew")
+
+mensaje_label = tk.Label(ventana, text="") #agregado
+mensaje_label.grid(row=1, column=3, padx=10, pady=10, sticky="nsew") #agregado
 
 boton_registrar_no = tk.Button(ventana, text="No", command=registrar_no)
 boton_registrar_no.grid(row=1, column=2, padx=10, pady=10, sticky="nsew")
@@ -318,6 +340,9 @@ def llenar_tabla(frame_in_canvas):
 def si_button_click(fecha_str):
     fecha_date = datetime.strptime(fecha_str, "%Y-%m-%d").date()
     insetar_asistencia(fecha_date,'si_trabajo')
+    cont_no_paga, total_pagar = dias_trabajados_total_pago()
+    mensaje_label_dias.config(text=str(cont_no_paga))
+    mensaje_label_pag.config(text=str(total_pagar))
     llenar_tabla(frame_in_canvas)
 
 def no_button_click(fecha_str):
@@ -356,9 +381,10 @@ canvas_1.create_window((0, 0), window=frame_in_canvas_1, anchor="nw")
 def si_button_pago(objeto):
     objeto.fecha_registro_pago = datetime.now().date()
     actualizar_estado_pagado(objeto)
+    cont_no_paga, total_pagar = dias_trabajados_total_pago()
+    mensaje_label_dias.config(text=str(cont_no_paga))
+    mensaje_label_pag.config(text=str(total_pagar))
     llenar_tabla_pago(frame_in_canvas_1)
-
-
 
 #calcular_fechas_pendientes()
 #pago_num_semana_estado()
@@ -384,6 +410,15 @@ def llenar_tabla_pago(frame_in_canvas_2):
 
     frame_in_canvas_2.update_idletasks()
 ######################################
+cont_no_paga, total_pagar = dias_trabajados_total_pago()
+
+tk.Label(ventana, text="Dias pendientes no pagados: ").grid(row=10, column=0, padx=10, pady=10, sticky="nsew")
+mensaje_label_dias = tk.Label(ventana, text=str(cont_no_paga)) #agregado
+mensaje_label_dias.grid(row=10, column=1, padx=10, pady=10, sticky="nsew") #agregado
+
+tk.Label(ventana, text="Total pendiente a pagar: ").grid(row=11, column=0, padx=10, pady=10, sticky="nsew")
+mensaje_label_pag = tk.Label(ventana, text=str(total_pagar)) #agregado
+mensaje_label_pag .grid(row=11, column=1, padx=10, pady=10, sticky="nsew") #agregado
 
 
 llenar_tabla(frame_in_canvas)
