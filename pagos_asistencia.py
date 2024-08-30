@@ -380,12 +380,38 @@ canvas_1.create_window((0, 0), window=frame_in_canvas_1, anchor="nw")
 # Funcion para marcar un pago
 def si_button_pago(objeto):
     objeto.fecha_registro_pago = datetime.now().date()
+    num_semana = objeto.numero_semana
+    fechas_pendientes = calcular_fechas_pendientes()
+    for fecha_str in fechas_pendientes:
+        fecha_date = datetime.strptime(fecha_str, "%Y-%m-%d").date()
+        numero_sem_asist_pendientes = obtener_numero_semana(fecha_date)
+        if num_semana == numero_sem_asist_pendientes:
+            mensaje_text = "No se puede realizar la operacion. Hay Asistencias pendientes por marcar!"
+            mostrar_mensaje_validacion(mensaje_text)
+            return # me saca inmediatamente de la funcion
+        
     actualizar_estado_pagado(objeto)
     cont_no_paga, total_pagar = dias_trabajados_total_pago()
     mensaje_label_dias.config(text=str(cont_no_paga))
     mensaje_label_pag.config(text=str(total_pagar))
     llenar_tabla_pago(frame_in_canvas_1)
 
+### Funcion para mostrar una nueva ventana emergente
+def mostrar_mensaje_validacion(mensaje_text):
+    # Crear una nueva ventana
+    ventana_validacion = tk.Toplevel(ventana)
+    ventana_validacion.title("menssaje")
+    ventana_validacion.geometry("500x150")
+    
+    # Crear un mensaje en la nueva ventana
+    mensaje = tk.Label(ventana_validacion, text = mensaje_text, pady=20)
+    mensaje.pack()
+
+    # Botón para cerrar la ventana
+    boton_cerrar = tk.Button(ventana_validacion, text="Cerrar", command=ventana_validacion.destroy)
+    boton_cerrar.pack(pady=10)
+
+    
 #calcular_fechas_pendientes()
 #pago_num_semana_estado()
 def llenar_tabla_pago(frame_in_canvas_2):
