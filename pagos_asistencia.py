@@ -1,12 +1,14 @@
 
 #### PAGOS DE CONSTRUCCION ####
-from base_datos_conexion import *
+
+import base_datos_conexion as db
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 from datetime import datetime, date, timedelta
 from openpyxl import Workbook
 from typing import List
+from tkcalendar import Calendar
 
 class Asistencia():
     def __init__(self,estado,fecha):
@@ -60,14 +62,14 @@ def pago_num_semana_estado():
     lista_semanas = []  
     semana_pagos = []
     
-    fecha_minima = buscar_fecha_minima()
-    fecha_maxima = buscar_fecha_maxima()
+    fecha_minima = db.buscar_fecha_minima()
+    fecha_maxima = db.buscar_fecha_maxima()
 
     if fecha_minima[0][0] and fecha_maxima[0][0]:
         num_semana_minima = obtener_numero_semana(fecha_minima[0][0])
         num_semana_maxima = obtener_numero_semana(fecha_maxima[0][0])
 
-        datos_semanas = obtener_semanas_pagadas()
+        datos_semanas = db.obtener_semanas_pagadas()
         for datos in datos_semanas:
             numero_semana = datos[1]
             lista_semanas.append(numero_semana)
@@ -77,12 +79,12 @@ def pago_num_semana_estado():
                 continue
             semana_pago = SemanaPagada(None, i, None, 'no_pagado')
 
-            insertar_pago(semana_pago)
+            db.insertar_pago(semana_pago)
 
 # Datos para mostrar en la interfaz
 def obtener_pagos_pendientes():
     lista_valores_pag = []
-    datos_semanas = obtener_semanas_pagadas()
+    datos_semanas = db.obtener_semanas_pagadas()
     fecha_actual = datetime.now().date()
     num_semana_actual = obtener_numero_semana(fecha_actual)
 
@@ -128,10 +130,10 @@ def insetar_asistencia(fecha, estado):
         return
 
     nueva_asistencia = Asistencia(estado, fecha)
-    fecha_coincidencias = buscar_asistencia_por_fecha(fecha)
+    fecha_coincidencias = db.buscar_asistencia_por_fecha(fecha)
     
     if not fecha_coincidencias:
-        insertar(nueva_asistencia)
+        db.insertar(nueva_asistencia)
         nueva_asistencia.imprimir()
         mensaje_label.config(text="Asistencia Registrada!!!!") #agregado
     else:
@@ -159,7 +161,7 @@ def generar_reporte():
     lista_tmp = []
     lista_resultado_excel = []
     lista_asistencias = []
-    datos = obtener_todas_asistencias()
+    datos = db.obtener_todas_asistencias()
 
 
     for dato in datos:
@@ -224,12 +226,12 @@ def exportar_excel(datos):
 def calcular_fechas_pendientes():
     fechas_registradas = set()
     fechas_pendientes = []
-    asis_todos_dias = obtener_todas_asistencias()
+    asis_todos_dias = db.obtener_todas_asistencias()
 
     for dato in asis_todos_dias:
         fechas_registradas.add(dato[1])
     
-    fecha_minima = buscar_fecha_minima()
+    fecha_minima = db.buscar_fecha_minima()
 
     fecha_minima_date = fecha_minima[0][0]
     fecha_maxima_date  = datetime.now().date()
@@ -254,12 +256,12 @@ def dias_trabajados_total_pago():
     dias_trabajados = []
     cont_no_paga = 0
     semanas_no_pagadas_list = []
-    asis_todos_dias = obtener_todas_asistencias()
+    asis_todos_dias = db.obtener_todas_asistencias()
     for dato in asis_todos_dias:
         if dato[2] == "si_trabajo":
             fechas_registradas.add(dato[1])
 
-    semanas_no_pagadas_list = obtener_semanas_pagadas(flag_pagado=False)
+    semanas_no_pagadas_list = db.obtener_semanas_pagadas(flag_pagado=False)
     for dato in semanas_no_pagadas_list:
         for dias in fechas_registradas:
             numero_sem = obtener_numero_semana(dias)
@@ -390,7 +392,7 @@ def si_button_pago(objeto):
             mostrar_mensaje_validacion(mensaje_text)
             return # me saca inmediatamente de la funcion
         
-    actualizar_estado_pagado(objeto)
+    db.actualizar_estado_pagado(objeto)
     cont_no_paga, total_pagar = dias_trabajados_total_pago()
     mensaje_label_dias.config(text=str(cont_no_paga))
     mensaje_label_pag.config(text=str(total_pagar))
@@ -446,6 +448,46 @@ tk.Label(ventana, text="Total pendiente a pagar: ").grid(row=11, column=0, padx=
 mensaje_label_pag = tk.Label(ventana, text=str(total_pagar)) #agregado
 mensaje_label_pag .grid(row=11, column=1, padx=10, pady=10, sticky="nsew") #agregado
 
+def mostrar_calendario():
+    # Crear una nueva ventana para el calendario
+    ventana_calendario = tk.Toplevel(ventana)
+    ventana_calendario.title("Selecciona una fecha")
+
+    # Crear un widget de calendario
+    calendario = Calendar(ventana_calendario, selectmode="day")
+    calendario.pack(pady=20)
+
+    def seleccionar_fecha():
+        # Obtener la fecha seleccionada y mostrarla en el campo de entrada
+        fecha_seleccionada = calendario.get_date()
+        fecha = datetime.strptime(fecha_seleccionada, "%m/%d/%y").date()
+        entry_fecha.delete(0, tk.END)
+        entry_fecha.insert(0, fecha)
+        ventana_calendario.destroy()
+
+    # Botón para seleccionar la fecha
+    boton_seleccionar = ttk.Button(ventana_calendario, text="Seleccionar", command=seleccionar_fecha)
+    boton_seleccionar.pack(pady=10)
+
+
+
+entry_fecha = ttk.Entry(ventana, width=20)
+entry_fecha.grid(row=4, column=3, padx=10, pady=20)
+
+def consultar_asistencia():
+    
+    print("45454545554")
+    print(type(entry_fecha.get()))
+    print(entry_fecha.get())
+    print("45454545554")
+
+# Botón con un ícono de calendario
+icono_calendario = tk.PhotoImage(file="calendario_2.png")  # Reemplaza con la ruta de tu ícono
+boton_calendario = ttk.Button(ventana, image=icono_calendario, command=mostrar_calendario)
+boton_calendario.grid(row=4, column=4)
+
+boton_consultar = tk.Button(ventana, text="Buscar", command=consultar_asistencia)
+boton_consultar.grid(row=4, column=5, padx=10, pady=2, sticky="nsew")
 
 llenar_tabla(frame_in_canvas)
 llenar_tabla_pago(frame_in_canvas_1)

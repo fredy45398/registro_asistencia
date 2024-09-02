@@ -5,7 +5,7 @@ config = {
     'user': 'root',
     'password': '',
     'host': 'localhost',
-    'database': 'des_asistenciadb'
+    'database': 'db_asistenciadb'
 }
 
 
@@ -72,11 +72,6 @@ def obtener_semanas_pagadas(flag_pagado=None):
             cursor.close()
             conn.close()
             print('Conexión cerrada')
-
-obtener_semanas_pagadas()
-obtener_semanas_pagadas(flag_pagado=True)
-obtener_semanas_pagadas(flag_pagado=False)
-
 
 
 def actualizar_estado_pagado(registro_de_pago):
