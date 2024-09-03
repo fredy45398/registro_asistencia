@@ -60,20 +60,21 @@ def pago_num_semana_estado():
     fecha_minima = buscar_fecha_minima()
     fecha_maxima = buscar_fecha_maxima()
 
-    num_semana_minima = obtener_numero_semana(fecha_minima[0][0])
-    num_semana_maxima = obtener_numero_semana(fecha_maxima[0][0])
+    if fecha_minima[0][0] and fecha_maxima[0][0]:
+        num_semana_minima = obtener_numero_semana(fecha_minima[0][0])
+        num_semana_maxima = obtener_numero_semana(fecha_maxima[0][0])
 
-    datos_semanas = obtener_semanas_pagadas()
-    for datos in datos_semanas:
-        numero_semana = datos[1]
-        lista_semanas.append(numero_semana)
- 
-    for i in range(num_semana_minima, num_semana_maxima + 1):
-        if i in lista_semanas:
-            continue
-        semana_pago = SemanaPagada(None, i, None, 'no_pagado')
+        datos_semanas = obtener_semanas_pagadas()
+        for datos in datos_semanas:
+            numero_semana = datos[1]
+            lista_semanas.append(numero_semana)
+    
+        for i in range(num_semana_minima, num_semana_maxima + 1):
+            if i in lista_semanas:
+                continue
+            semana_pago = SemanaPagada(None, i, None, 'no_pagado')
 
-        insertar_pago(semana_pago)
+            insertar_pago(semana_pago)
 
 # Datos para mostrar en la interfaz
 def obtener_pagos_pendientes():
