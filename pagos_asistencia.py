@@ -79,11 +79,14 @@ def pago_num_semana_estado():
 def obtener_pagos_pendientes():
     lista_valores_pag = []
     datos_semanas = obtener_semanas_pagadas()
+    fecha_actual = datetime.now().date()
+    num_semana_actual = obtener_numero_semana(fecha_actual)
+
     for datos in datos_semanas:
         id_semanas_pagadas = datos[0]
         numero_semana = datos[1]
         estado_pago = datos[3]
-        if estado_pago != 'si_pagado':
+        if estado_pago != 'si_pagado' and numero_semana < num_semana_actual:
             lista_valores_pag.append(SemanaPagada(id_semanas_pagadas, numero_semana, None, estado_pago))
 
 
@@ -117,8 +120,8 @@ def registrar_i():
 def insetar_asistencia(fecha, estado):
     dia_semana = fecha.weekday()
 
-    if dia_semana == 5 or dia_semana == 6:
-        print("No se puede registrar asistencia")
+    if dia_semana == 5 or dia_semana == 6: # 5 Sabado, 6 Domingo
+        print("No se puede registrar asistencia de Sabados y Domingos")
         return
 
     nueva_asistencia = Asistencia(estado, fecha)
@@ -165,7 +168,7 @@ def generar_reporte():
         num_semana = obtener_numero_semana(fecha_registro)
         lista_tmp.append(DiaNumeroSemana(num_semana, fecha_registro,estado_))
 
-    for num_sem in range(1,36):
+    for num_sem in range(1,53):
         dias_semana = []
         dias_trabajados = 0
 
@@ -224,19 +227,27 @@ def calcular_fechas_pendientes():
         fechas_registradas.add(dato[1])
     
     fecha_minima = buscar_fecha_minima()
-    fecha_maxima = buscar_fecha_maxima()
 
     fecha_minima_date = fecha_minima[0][0]
-    fecha_maxima_date = fecha_maxima[0][0]
+    fecha_maxima_date  = datetime.now().date()
     fecha_nueva_date = fecha_minima_date
-    
-    while fecha_nueva_date < fecha_maxima_date:
+
+    print("hoyyyyyyyyyyyy")
+    print(fecha_maxima_date)
+    print("hoyyyyyyyyyyyy")
+
+   
+    if fecha_minima_date and fecha_maxima_date:
         fecha_nueva_date += timedelta(days=1)
-        dia_num = fecha_nueva_date.weekday()
-        if dia_num == 5 or dia_num == 6:
-            continue
-        if fecha_nueva_date not in fechas_registradas:
-            fechas_pendientes.append(str(fecha_nueva_date))
+        while fecha_nueva_date < fecha_maxima_date:
+            dia_num = fecha_nueva_date.weekday()
+            
+            if dia_num == 5 or dia_num == 6:
+                fecha_nueva_date += timedelta(days=1)
+                continue
+            if fecha_nueva_date not in fechas_registradas:
+                fechas_pendientes.append(str(fecha_nueva_date))
+            fecha_nueva_date += timedelta(days=1)
 
     return fechas_pendientes 
 
@@ -282,7 +293,7 @@ canvas.create_window((0, 0), window=frame_in_canvas, anchor="nw")
 
 
 #calcular_fechas_pendientes()
-#pago_num_semana_estado()
+pago_num_semana_estado()
 def llenar_tabla(frame_in_canvas):
     # Primero, eliminar todas las filas existentes en la tabla
     for widget in frame_in_canvas.winfo_children():
