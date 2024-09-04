@@ -5,7 +5,7 @@ config = {
     'user': 'root',
     'password': '',
     'host': 'localhost',
-    'database': 'des_asistenciadb'
+    'database': 'asistenciadb'
 }
 
 
