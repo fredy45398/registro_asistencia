@@ -147,6 +147,9 @@ def insetar_asistencia(fecha, estado):
 def registrar_si():
     fecha_actual = datetime.now().date()
     insetar_asistencia(fecha_actual,'si_trabajo')
+    cont_no_paga, total_pagar = dias_trabajados_total_pago()
+    mensaje_label_dias.config(text=str(cont_no_paga))
+    mensaje_label_pag.config(text=str(total_pagar))
 
 
 def registrar_no():
