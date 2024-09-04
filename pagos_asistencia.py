@@ -70,6 +70,9 @@ def pago_num_semana_estado():
         num_semana_maxima = obtener_numero_semana(fecha_maxima[0][0])
 
         datos_semanas = db.obtener_semanas_pagadas()
+        print("222222222233333333333333333")
+        print(datos_semanas)
+        print("222222222233333333333333333")
         for datos in datos_semanas:
             numero_semana = datos[1]
             lista_semanas.append(numero_semana)
@@ -166,10 +169,17 @@ def generar_reporte():
 
     for dato in datos:
         lista_asistencias.append(Asistencia(dato[2], dato[1]))
-
+    print("77777777777777778888888")
+    print(lista_asistencias)
+    print(type(lista_asistencias))
+    print("7777777777777777888888")
     for registro in lista_asistencias:
         fecha_registro = registro.fecha
         estado_ = registro.estado
+        print("7777777777777777")
+        print(fecha_registro)
+        print(type(fecha_registro))
+        print("7777777777777777")
         num_semana = obtener_numero_semana(fecha_registro)
         lista_tmp.append(DiaNumeroSemana(num_semana, fecha_registro,estado_))
 
@@ -276,24 +286,24 @@ def dias_trabajados_total_pago():
 ventana = tk.Tk()
 ventana.title("Formulario de Registro")
 ventana.geometry("1000x1000")
+ventana.configure(bg="lightblue")
 
+tk.Label(ventana, text="Se trabajo hoy?", bg="#2755a2", fg="white").grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
 
-tk.Label(ventana, text="Se trabajo hoy?").grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
-
-boton_registrar_si = tk.Button(ventana, text="Si", command=registrar_si)
+boton_registrar_si = tk.Button(ventana, text="Si",bg="#2755a2", fg="white", command=registrar_si)
 boton_registrar_si.grid(row=1, column=1, padx=10, pady=10, sticky="nsew")
 
 mensaje_label = tk.Label(ventana, text="") #agregado
 mensaje_label.grid(row=1, column=3, padx=10, pady=10, sticky="nsew") #agregado
 
-boton_registrar_no = tk.Button(ventana, text="No", command=registrar_no)
+boton_registrar_no = tk.Button(ventana, text="No",bg="#2755a2", fg="white", command=registrar_no)
 boton_registrar_no.grid(row=1, column=2, padx=10, pady=10, sticky="nsew")
 
-boton_generar_reporte = tk.Button(ventana, text="Generar Reporte", command=generar_reporte)
+boton_generar_reporte = tk.Button(ventana, text="Generar Reporte", command=generar_reporte, bg="#2755a2", fg="white")
 boton_generar_reporte.grid(row=2, column=3, padx=10, pady=10, sticky="nsew")
 
 
-tk.Label(ventana, text="Asistencias pendientes: ").grid(row=4, column=0, padx=10, pady=10, sticky="nsew")
+tk.Label(ventana, text="Asistencias pendientes: ", bg="#2755a2", fg="white").grid(row=4, column=0, padx=10, pady=10, sticky="nsew")
 frame = tk.Frame(ventana)
 frame.place(relx=0.5, rely=0.5, anchor="center")
 frame.grid(row=5, column=0)
@@ -311,7 +321,7 @@ canvas.configure(yscrollcommand=scrollbar.set)
 canvas.bind('<Configure>', lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
 
 # Crear un frame secundario dentro del Canvas, con borde y fondo claro
-frame_in_canvas = tk.Frame(canvas, bd=2, relief="solid", bg="#0000FF")  # Añadir fondo claro
+frame_in_canvas = tk.Frame(canvas, bd=2, relief="solid", bg="#e2e2e1")  # Añadir fondo claro
 canvas.create_window((0, 0), window=frame_in_canvas, anchor="nw")
 
 
@@ -325,16 +335,18 @@ def llenar_tabla(frame_in_canvas):
         widget.destroy()
 
     valores = calcular_fechas_pendientes()
-    
+
+    label_fecha = tk.Label(frame_in_canvas, text="Fecha", bg="#e2e2e1", width=10)
+    label_fecha.grid(row=0, column=0)
 
     for i, valor in enumerate(valores):
-        label = tk.Label(frame_in_canvas, text=valor, width=15, anchor="w", bg="#f0f0f0")
-        label.grid(row=i, column=0, padx=5, pady=2)
-        boton_si = tk.Button(frame_in_canvas, text="SI", command=lambda i=i: si_button_click(valores[i]))
-        boton_si.grid(row=i,columnspan=2, column=1, padx=5, pady=2)
+        label = tk.Label(frame_in_canvas, text=valor, width=15, anchor="w", bg="#e2e2e1")
+        label.grid(row=i+1, column=0, padx=5, pady=2)
+        boton_si = tk.Button(frame_in_canvas, text="SI",bg="#2755a2", fg="white", command=lambda i=i: si_button_click(valores[i]))
+        boton_si.grid(row=i+1,columnspan=2, column=1, padx=5, pady=2)
 
-        boton_no = tk.Button(frame_in_canvas, text="NO", command=lambda i=i: no_button_click(valores[i]))
-        boton_no.grid(row=i,columnspan=2, column=4, padx=5, pady=2)
+        boton_no = tk.Button(frame_in_canvas, bg="#2755a2", fg="white", text="NO", command=lambda i=i: no_button_click(valores[i]))
+        boton_no.grid(row=i+1,columnspan=2, column=4, padx=5, pady=2)
     frame_in_canvas.update_idletasks()
 
     
@@ -356,7 +368,7 @@ def no_button_click(fecha_str):
 
 
 ###################################### Segunda Tabla
-tk.Label(ventana, text="Pagos pendientes: ").grid(row=6, column=0, padx=10, pady=10, sticky="nsew")
+tk.Label(ventana, text="Pagos pendientes: ", bg="#2755a2", fg="white").grid(row=6, column=0, padx=10, pady=10, sticky="nsew")
 frame_1 = tk.Frame(ventana)
 frame_1.place(relx=0.5, rely=0.5, anchor="center")
 frame_1.grid(row=7, column=0)
@@ -374,7 +386,7 @@ canvas_1.configure(yscrollcommand=scrollbar_1.set)
 canvas_1.bind('<Configure>', lambda e: canvas_1.configure(scrollregion=canvas_1.bbox("all")))
 
 # Crear un frame secundario dentro del Canvas, con borde y fondo claro
-frame_in_canvas_1 = tk.Frame(canvas_1, bd=2, relief="solid", bg="#0000FF")  # Añadir fondo claro
+frame_in_canvas_1 = tk.Frame(canvas_1, bd=2, relief="solid", bg="#e2e2e1")  # Añadir fondo claro
 canvas_1.create_window((0, 0), window=frame_in_canvas_1, anchor="nw")
 
 
@@ -423,29 +435,35 @@ def llenar_tabla_pago(frame_in_canvas_2):
 
     lista_valores = obtener_pagos_pendientes()
 
+    label_cab_pagos = tk.Label(frame_in_canvas_2, text="N de Semana", bg="#e2e2e1", width=15)
+    label_cab_pagos.grid(row=0, column=0)
+
+    label_cab_fecha = tk.Label(frame_in_canvas_2, text="Rango de Semana", bg="#e2e2e1", width=15)
+    label_cab_fecha.grid(row=0, column=1)
+
     for i, valor in enumerate(lista_valores):
-        label = tk.Label(frame_in_canvas_2, text=valor.numero_semana, width=15, anchor="w", bg="#f0f0f0")
-        label.grid(row=i, column=0, padx=5, pady=2)
+        label = tk.Label(frame_in_canvas_2, text=valor.numero_semana, width=15, anchor="w", bg="#e2e2e1")
+        label.grid(row=i+1, column=0, padx=5, pady=2)
 
         fecha_inicial, fecha_final = obtener_fecha_inicio_final_numero_semana(2024, valor.numero_semana)
         fecha_junta = str(fecha_inicial) + " / " + str(fecha_final)
 
-        label_2 = tk.Label(frame_in_canvas_2, text=fecha_junta, width=25, anchor="w", bg="#f0f0f0")
-        label_2.grid(row=i, column=1, padx=5, pady=2)
+        label_2 = tk.Label(frame_in_canvas_2, text=fecha_junta, width=25, anchor="w", bg="#e2e2e1")
+        label_2.grid(row=i+1, column=1, padx=5, pady=2)
         
-        boton_si = tk.Button(frame_in_canvas_2, text="SI", command=lambda i=i: si_button_pago(lista_valores[i]))
-        boton_si.grid(row=i, column=5, padx=5, pady=2)
+        boton_si = tk.Button(frame_in_canvas_2, text="SI",bg="#2755a2", fg="white", command=lambda i=i: si_button_pago(lista_valores[i]))
+        boton_si.grid(row=i+1, column=5, padx=5, pady=2)
 
     frame_in_canvas_2.update_idletasks()
 ######################################
 cont_no_paga, total_pagar = dias_trabajados_total_pago()
 
-tk.Label(ventana, text="Dias pendientes no pagados: ").grid(row=10, column=0, padx=10, pady=10, sticky="nsew")
-mensaje_label_dias = tk.Label(ventana, text=str(cont_no_paga)) #agregado
+tk.Label(ventana, text="Dias pendientes no pagados: ", bg="#2755a2", fg="white").grid(row=10, column=0, padx=10, pady=10, sticky="nsew")
+mensaje_label_dias = tk.Label(ventana, text=str(cont_no_paga), bg="#2755a2", fg="white") #agregado
 mensaje_label_dias.grid(row=10, column=1, padx=10, pady=10, sticky="nsew") #agregado
 
-tk.Label(ventana, text="Total pendiente a pagar: ").grid(row=11, column=0, padx=10, pady=10, sticky="nsew")
-mensaje_label_pag = tk.Label(ventana, text=str(total_pagar)) #agregado
+tk.Label(ventana, text="Total pendiente a pagar: ", bg="#2755a2", fg="white").grid(row=11, column=0, padx=10, pady=10, sticky="nsew")
+mensaje_label_pag = tk.Label(ventana, text=str(total_pagar), bg="#2755a2", fg="white") #agregado
 mensaje_label_pag .grid(row=11, column=1, padx=10, pady=10, sticky="nsew") #agregado
 
 def mostrar_calendario():
@@ -464,7 +482,7 @@ def mostrar_calendario():
         entry_fecha.delete(0, tk.END)
         entry_fecha.insert(0, fecha)
         ventana_calendario.destroy()
-
+        
     # Botón para seleccionar la fecha
     boton_seleccionar = ttk.Button(ventana_calendario, text="Seleccionar", command=seleccionar_fecha)
     boton_seleccionar.pack(pady=10)
@@ -475,19 +493,31 @@ entry_fecha = ttk.Entry(ventana, width=20)
 entry_fecha.grid(row=4, column=3, padx=10, pady=20)
 
 def consultar_asistencia():
+    fecha_calendar = entry_fecha.get()
+    estado_trabajo = "No hay registros!!!!"
+    if fecha_calendar:
+        fecha = datetime.strptime(fecha_calendar, "%Y-%m-%d").date()
+        fecha_bd = db.buscar_asistencia_por_fecha(fecha)
+        for estado in fecha_bd:
+            estado_trabajo = estado[2]
     
-    print("45454545554")
-    print(type(entry_fecha.get()))
-    print(entry_fecha.get())
-    print("45454545554")
+    if estado_trabajo:
+        label_result.config(text=estado_trabajo)
+    
+    print(estado_trabajo)
+
 
 # Botón con un ícono de calendario
 icono_calendario = tk.PhotoImage(file="calendario_2.png")  # Reemplaza con la ruta de tu ícono
 boton_calendario = ttk.Button(ventana, image=icono_calendario, command=mostrar_calendario)
 boton_calendario.grid(row=4, column=4)
 
-boton_consultar = tk.Button(ventana, text="Buscar", command=consultar_asistencia)
+boton_consultar = tk.Button(ventana, text="Buscar", command=consultar_asistencia, bg="#2755a2", fg="white")
 boton_consultar.grid(row=4, column=5, padx=10, pady=2, sticky="nsew")
+
+
+label_result = tk.Label(ventana, text="", anchor="w", bg="#e2e2e1")
+label_result.grid(row=5, column=5, padx=5, pady=2)
 
 llenar_tabla(frame_in_canvas)
 llenar_tabla_pago(frame_in_canvas_1)

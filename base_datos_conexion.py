@@ -5,11 +5,12 @@ config = {
     'user': 'root',
     'password': '',
     'host': 'localhost',
-    'database': 'db_asistenciadb'
+    'database': 'des_asistenciadb'
 }
 
 
 def insertar(nueva_asistencia):
+    conn = None
     try:
         conn = mysql.connector.connect(**config)
         if conn.is_connected():
@@ -23,12 +24,13 @@ def insertar(nueva_asistencia):
     except mysql.connector.Error as err:
         print(f'Error: {err}')
     finally:
-        if conn.is_connected():
+        if conn and conn.is_connected():
             cursor.close()
             conn.close()
             print('Conexión cerrada')
 
 def insertar_pago(nuevo_pago):
+    conn = None
     try:
         conn = mysql.connector.connect(**config)
         if conn.is_connected():
@@ -42,12 +44,13 @@ def insertar_pago(nuevo_pago):
     except mysql.connector.Error as err:
         print(f'Error: {err}')
     finally:
-        if conn.is_connected():
+        if conn and conn.is_connected():
             cursor.close()
             conn.close()
             print('Conexión cerrada')
 
 def obtener_semanas_pagadas(flag_pagado=None):
+    conn = None
     try:
         conn = mysql.connector.connect(**config)
         if conn.is_connected():
@@ -68,13 +71,14 @@ def obtener_semanas_pagadas(flag_pagado=None):
     except mysql.connector.Error as err:
         print(f'Error: {err}')
     finally:
-        if conn.is_connected():
+        if conn and conn.is_connected():
             cursor.close()
             conn.close()
             print('Conexión cerrada')
 
 
 def actualizar_estado_pagado(registro_de_pago):
+    conn = None
     try:
         conn = mysql.connector.connect(**config)
         if conn.is_connected():
@@ -88,12 +92,13 @@ def actualizar_estado_pagado(registro_de_pago):
     except mysql.connector.Error as err:
         print(f'Error: {err}')
     finally:
-        if conn.is_connected():
+        if conn and conn.is_connected():
             cursor.close()
             conn.close()
             print('Conexión cerrada')
 
 def buscar_asistencia_por_fecha(fecha):
+    conn = None
     try:
         conn = mysql.connector.connect(**config)
         if conn.is_connected():
@@ -108,12 +113,13 @@ def buscar_asistencia_por_fecha(fecha):
     except mysql.connector.Error as err:
         print(f'Error: {err}')
     finally:
-        if conn.is_connected():
+        if conn and conn.is_connected():
             cursor.close()
             conn.close()
             print('Conexión cerrada')
 
 def obtener_todas_asistencias():
+    conn = None
     try:
         conn = mysql.connector.connect(**config)
         if conn.is_connected():
@@ -128,12 +134,13 @@ def obtener_todas_asistencias():
     except mysql.connector.Error as err:
         print(f'Error: {err}')
     finally:
-        if conn.is_connected():
+        if conn and conn.is_connected():
             cursor.close()
             conn.close()
             print('Conexión cerrada')
 
 def buscar_estado():
+    conn = None
     try:
         conn = mysql.connector.connect(**config)
         if conn.is_connected():
@@ -147,12 +154,13 @@ def buscar_estado():
     except mysql.connector.Error as err:
         print(f'Error: {err}')
     finally:
-        if conn.is_connected():
+        if conn and conn.is_connected():
             cursor.close()
             conn.close()
             print('Conexión cerrada')
 
 def buscar_fecha_minima():
+    conn = None
     try:
         conn = mysql.connector.connect(**config)
         if conn.is_connected():
@@ -166,12 +174,13 @@ def buscar_fecha_minima():
     except mysql.connector.Error as err:
         print(f'Error: {err}')
     finally:
-        if conn.is_connected():
+        if conn and conn.is_connected():
             cursor.close()
             conn.close()
             print('Conexión cerrada')
 
 def buscar_fecha_maxima():
+    conn = None
     try:
         conn = mysql.connector.connect(**config)
         if conn.is_connected():
@@ -185,7 +194,7 @@ def buscar_fecha_maxima():
     except mysql.connector.Error as err:
         print(f'Error: {err}')
     finally:
-        if conn.is_connected():
+        if conn and conn.is_connected():
             cursor.close()
             conn.close()
             print('Conexión cerrada')
